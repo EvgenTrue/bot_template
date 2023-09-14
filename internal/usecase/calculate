@@ -1,0 +1,24 @@
+package usecase
+
+import "net/http"
+
+type CalculateCurrencyUsecase struct{
+	
+}
+func New()*CalculateCurrencyUsecase{
+	return &CalculateCurrencyUsecase{
+
+	}
+}
+func (c *CalculateCurrencyUsecase)Calculate(sum int, currency string)(int, error){
+	res, err := http.Get(fmt.Sprintf("https://currate.ru/api/?get=rates&pairs=%sRUB&key=c928d94ff04728cf9ff8ac5e77ec17de", currency))
+	if err != nil {
+		return 0, err
+	}
+
+	defer res.Body.Close()
+	body, err := io.ReadAll(res.Body)
+	fmt.Println(string(body), err)
+	 
+ 
+}
