@@ -6,18 +6,16 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/evgentrue/bot_template/internal/storage"
 	"github.com/evgentrue/bot_template/internal/usecase"
-	
+	"github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-type Item struct{
+type Item struct {
 	Name string
-	Sum int
-	Cur string
+	Sum  int
+	Cur  string
 }
-
-
 
 func main() {
 	// https://t.me/ex_2_go_bot
@@ -31,42 +29,40 @@ func main() {
 	u.Timeout = 60
 
 	updates := bot.GetUpdatesChan(u)
-	memory:=make(map[string]Item)
-	calc:=usecase.New()
+	s:= storage.NewMemoryStorage()
+	
+	calc := usecase.New()
 
 	//Новая midi клавиатура 1000 USD
 	for update := range updates {
 		if update.Message != nil { // If we got a message
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-			str:=strings.Split(update.Message.Text," ")
-			
-			
-			 
-			
-			name:=strings.Join(str[:len(str)-2], " ")
+			str := strings.Split(update.Message.Text, " ")
 
-			sum:=str[len(str)-2]
-			cur:=str[len(str)-1]
-			sumint, err :=strconv.Atoi(sum)
-			if err !=nil {
-					fmt.Println(err)
+			name := strings.Join(str[:len(str)-2], " ")
+
+			sum := str[len(str)-2]
+			cur := str[len(str)-1]
+			sumint, err := strconv.Atoi(sum)
+			if err != nil {
+				fmt.Println(err)
 			}
-			calc.Calculate(sum,cur)
-		memory[name]=Item{Name: name, Sum: sumint, Cur: cur}
-			fmt.Println(memory)
+			r, err:=calc.Calculate(sumint, cur)
+				if err!=nil{
+				continue
+			}
+			
+
+			s.AddItem(storage.Item{Name : name,Sum: r, Currency: "RUB" })
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 			msg.ReplyToMessageID = update.Message.MessageID
 
 			bot.Send(msg)
 		}
 	}
-	
-	
-	 
+
 }
- 
-const refString = "Mary had a little lamb"
- 
+
 // 0. Репу форкнуть, склонировать
 //1. Распарсить строку // string, regexp, strings.Contains
 //2. Создать InMemoryStorage (map + lock) // Продукты 1000 RUB map + lock (* interface)
@@ -79,7 +75,7 @@ const refString = "Mary had a little lamb"
 //3.3 использовать пакет http для перевода в рубли(сделать get или post)
 //3.4 разобрать ответ от сервера
 //4. Конкурентные походы по сети за курсом 4 запроса параллельно, и выбираешь минимальный курс (interface + solid) // goroutine, channel, interface
-//5. Команду вывода в боте, sum // map 
+//5. Команду вывода в боте, sum // map
 //6. InMemory убираем, добавляем DB // clean arch, repository, models, sql
 //7. Команду вывода с фильтром по месяцу
 //8. Actions, linters // ci/cd
