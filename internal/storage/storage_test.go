@@ -46,17 +46,28 @@ func TestInMemoryStorage_GetItem(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		
+
 		args args
 		want Item
 	}{
-		// TODO: Add test cases.
+		{
+			name: "succes",
+			args: args{
+				key: "xx",
+			},
+			want: Item{
+				Name:     "og",
+				Sum:      10,
+				Currency: "EUR",
+			},
+		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			a := NewMemoryStorage()
-			a.GetItem(tt.args.key)
-			f := a.List[tt.args.key]=tt.args.key
+
+			a.List[tt.args.key] = tt.want
 
 			if got := a.GetItem(tt.args.key); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("InMemoryStorage.GetItem() = %v, want %v", got, tt.want)

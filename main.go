@@ -8,7 +8,8 @@ import (
 
 	"github.com/evgentrue/bot_template/internal/storage"
 	"github.com/evgentrue/bot_template/internal/usecase"
-	"github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/evgentrue/bot_template/internal/usecase/provider"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 type Item struct {
@@ -29,9 +30,10 @@ func main() {
 	u.Timeout = 60
 
 	updates := bot.GetUpdatesChan(u)
-	s:= storage.NewMemoryStorage()
-	
-	calc := usecase.New()
+	s := storage.NewMemoryStorage()
+
+	currate := provider.NewCurrateProvider()
+	calc := usecase.New(currate)
 
 	//Новая midi клавиатура 1000 USD
 	for update := range updates {
@@ -47,13 +49,12 @@ func main() {
 			if err != nil {
 				fmt.Println(err)
 			}
-			r, err:=calc.Calculate(sumint, cur)
-				if err!=nil{
+			r, err := calc.Calculate(sumint, cur)
+			if err != nil {
 				continue
 			}
-			
 
-			s.AddItem(storage.Item{Name : name,Sum: r, Currency: "RUB" })
+			s.AddItem(storage.Item{Name: name, Sum: r, Currency: "RUB"})
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 			msg.ReplyToMessageID = update.Message.MessageID
 
@@ -79,3 +80,5 @@ func main() {
 //6. InMemory убираем, добавляем DB // clean arch, repository, models, sql
 //7. Команду вывода с фильтром по месяцу
 //8. Actions, linters // ci/cd
+
+//go1.21.1
