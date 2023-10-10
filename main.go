@@ -31,9 +31,9 @@ func main() {
 
 	updates := bot.GetUpdatesChan(u)
 	s := storage.NewMemoryStorage()
-
-	currate := provider.NewCurrateProvider()
-	calc := usecase.New(currate)
+	fixer := provider.NewFixerProvider()
+	//currate := provider.NewCurrateProvider()
+	calc := usecase.New(fixer)
 
 	//Новая midi клавиатура 1000 USD
 	for update := range updates {

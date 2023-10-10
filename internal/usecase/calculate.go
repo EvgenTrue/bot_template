@@ -2,8 +2,6 @@ package usecase
 
 import (
 	"fmt"
-
-	"github.com/evgentrue/bot_template/internal/usecase/provider"
 )
 
 type Response struct {
@@ -11,12 +9,15 @@ type Response struct {
 	Message string            `json:"message"`
 	Data    map[string]string `json:"data"`
 }
-
-type CalculateCurrencyUsecase struct {
-	provider *provider.CurrateProvider
+type CurrencyProvider interface {
+	GetCurrency(currency string) (float64, error)
 }
 
-func New(p *provider.CurrateProvider) *CalculateCurrencyUsecase {
+type CalculateCurrencyUsecase struct {
+	provider CurrencyProvider
+}
+
+func New(p CurrencyProvider) *CalculateCurrencyUsecase {
 	return &CalculateCurrencyUsecase{
 		provider: p,
 	}
