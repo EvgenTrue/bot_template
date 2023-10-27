@@ -20,7 +20,9 @@ type ResponseCurrate struct {
 func NewCurrateProvider() *CurrateProvider {
 	return &CurrateProvider{}
 }
-
+func (c *CurrateProvider)GetName()string{
+	return "currency"
+} 
 func (c *CurrateProvider) GetCurrency(currency string) (float64, error) {
 	res, err := http.Get(fmt.Sprintf("https://currate.ru/api/?get=rates&pairs=%sRUB&key=c928d94ff04728cf9ff8ac5e77ec17de", currency))
 	if err != nil {

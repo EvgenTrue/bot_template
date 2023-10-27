@@ -11,22 +11,36 @@ type Response struct {
 }
 type CurrencyProvider interface {
 	GetCurrency(currency string) (float64, error)
+	GetName()string
 }
 
 type CalculateCurrencyUsecase struct {
-	provider CurrencyProvider
+	 
+	provider []CurrencyProvider
 }
 
-func New(p CurrencyProvider) *CalculateCurrencyUsecase {
+func New(p []CurrencyProvider) *CalculateCurrencyUsecase {
 	return &CalculateCurrencyUsecase{
 		provider: p,
 	}
 }
 func (c *CalculateCurrencyUsecase) Calculate(sum int, currency string) (int, error) {
-	t, err := c.provider.GetCurrency(currency)
-	if err != nil {
-		return 0, err
+	ch:=make(chan float64)
+	for _,pp:=range c.provider{
+		go func(){
+			var t float64
+			var err error
+			t, err = pp.GetCurrency(currency)
+	
+			if err != nil {
+				fmt.Println(err)
+				return
+			} 
+			ch<-t
+		}()
+	
 	}
+
 
 	t = float64(sum) * t * 1000
 	i := int(t)

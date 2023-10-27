@@ -19,7 +19,9 @@ type ResponseFixer struct {
 func NewFixerProvider() *FixerProvider {
 	return &FixerProvider{}
 }
-
+func (c *FixerProvider)GetName()string{
+	return "fixer"
+}
 func (c *FixerProvider) GetCurrency(currency string) (float64, error) {
 	res, err := http.Get(fmt.Sprintf("https://data.fixer.io/api/latest?&base=RUB&symbols=%s&access_key=bff0d81f6bc0c7e5c279c24bb5f2bd0e", currency))
 	if err != nil {
