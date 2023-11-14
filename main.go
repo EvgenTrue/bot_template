@@ -33,8 +33,9 @@ func main() {
 	s := storage.NewMemoryStorage()
 	fixer := provider.NewFixerProvider()
 	currate := provider.NewCurrateProvider()
+	dammy := provider.NewDammyProvider()
 	calc := usecase.New([]usecase.CurrencyProvider{
-		fixer, currate,
+		fixer, currate, dammy,
 	})
 
 	//Новая midi клавиатура 1000 USD
@@ -52,6 +53,7 @@ func main() {
 				fmt.Println(err)
 			}
 			r, err := calc.Calculate(sumint, cur)
+			fmt.Println(r, "r")
 			if err != nil {
 				continue
 			}
