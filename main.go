@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
+	"os"
+	"os/signal"
 	"strconv"
 	"strings"
 
@@ -20,6 +23,15 @@ type Item struct {
 }
 
 func main() {
+	ctx:=context.Background()
+	ctx, cancel:=context.WithCancel(ctx)
+	defer cancel()
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		<-c
+		cancel()
+		}()
 	// https://t.me/ex_2_go_bot
 	bot, err := tgbotapi.NewBotAPI("6516198339:AAH7kfNtyYH3-TiODIFJ8LgFBMGs352mfvU")
 	if err != nil {
@@ -44,10 +56,13 @@ func main() {
 
 	//Новая midi клавиатура 1000 USD
 	for update := range updates {
+		if ctx.Err()!=nil{
+			return
+		}
 		if update.Message != nil { // If we got a message
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 			if update.Message.Text=="GetLast"{
-				item := repo.GetLast()
+				item := repo.GetLast(ctx)
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Name : %s,Sum : %d, Currency : %s", item.Name, item.Sum, item.Currency))
 			msg.ReplyToMessageID = update.Message.MessageID
 
@@ -70,7 +85,7 @@ func main() {
 				continue
 			}
 
-			repo.AddItem(storage.Item{Name: name, Sum: r, Currency: "RUB"})
+			repo.AddItem(ctx, storage.Item{Name: name, Sum: r, Currency: "RUB"})
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 			msg.ReplyToMessageID = update.Message.MessageID
 
