@@ -11,7 +11,7 @@ type ResponseDammy struct {
 func NewDammyProvider() *DammyProvider {
 	return &DammyProvider{}
 }
-func (c *DammyProvider) GetName() string {
+func (c *DammyProvider) GetName() string {  //???
 	return "fixer"
 }
 func (c *DammyProvider) GetCurrency(currency string) (float64, error) {

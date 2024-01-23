@@ -1,0 +1,44 @@
+create table 
+
+create table item (id bigserial, name text, sum int, currency varchar(5));
+
+
+1 таблица
+create table track (id bigserial, song varchar(15), album_id int);
+insert into track (song, album_id) values ('1 канал', 1), ('город дорог', 2), ('выдыхай', 1), ('кукла колдуна', 5), ('грабли', 1), ('люди с автоматами', 1), ('сансара', 2), ('где нас нет', 3), ('вселенная бесконечна', 4), ('все как у людей', 6); 
+select * from track;
+2 таблица
+create table artist (artistik varchar(30), id int);
+insert into artist (artistik, id) values ('noise ms', 1), ('oxxxy', 2), ('basta', 3), ('король и шут', 4);
+
+3 таблица
+create table album (id bigserial, album varchar(30));
+insert into album (id, album) values (1, 'царь горы'), (2, 'basta 3'), (3, 'город под подошвой'), (4, 'неразбериха'), (5, 'ели мясо мужики'), (6, 'орфей');
+
+4 таблица 
+create table albumartist (album int, artist int);
+insert into albumartist (album, artist) values (1, 1), (2, 3), (3, 2), (4, 1), (5, 4), (6, 1);
+
+5 таблица
+create table artisttrack (track int, artist int);
+insert into artisttrack (track, artist) values (1, 1), (2, 3), (3, 1), (4, 4), (5, 1), (6, 1), (7, 3), (8, 2), (9, 1), (10, 1);
+
+
+alter table track add column song varchar(30);
+
+
+1  задание
+Написать запрос который выведет артистов у которых больше 3 альбомов					
+select artist.id from artist join albumartist on artist.id=albumartist.artist group by artist.id having count(*)>=3;	
+
+2  задание
+Вывести все альбомы одного исполнителя на выбор  
+select album.album from album join albumartist on album.id=albumartist.album where albumartist.artist=3;  
+
+3  задание
+Вывести все треки одного исполнителя 
+select track.song from track join 
+4  задание
+Написать запрос который выведет артистов у которых больше 2 альбомов, внутри которых больше 2 треков
+
+select artist.artistik from artist join albumartist on artisttrack.track=artist.id group by artist.id having count(*)>=2

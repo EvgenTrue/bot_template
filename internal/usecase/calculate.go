@@ -29,6 +29,7 @@ func (c *CalculateCurrencyUsecase) Calculate(sum int, currency string) (int, err
 	var wg sync.WaitGroup
 	wg.Add(len(c.provider))
 	for _, pp := range c.provider {
+		pp:=pp
 		go func() {
 			defer wg.Done()
 			var t float64

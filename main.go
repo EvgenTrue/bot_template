@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/evgentrue/bot_template/internal/repo"
 	"github.com/evgentrue/bot_template/internal/storage"
 	"github.com/evgentrue/bot_template/internal/usecase"
 	"github.com/evgentrue/bot_template/internal/usecase/provider"
@@ -30,7 +31,10 @@ func main() {
 	u.Timeout = 60
 
 	updates := bot.GetUpdatesChan(u)
-	s := storage.NewMemoryStorage()
+	//s := storage.NewMemoryStorage()
+	db := storage.Newdbstorage()
+	repo := repo.NewItemRepo(db)
+
 	fixer := provider.NewFixerProvider()
 	currate := provider.NewCurrateProvider()
 	dammy := provider.NewDammyProvider()
@@ -42,6 +46,14 @@ func main() {
 	for update := range updates {
 		if update.Message != nil { // If we got a message
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+			if update.Message.Text=="GetLast"{
+				item := repo.GetLast()
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Name : %s,Sum : %d, Currency : %s", item.Name, item.Sum, item.Currency))
+			msg.ReplyToMessageID = update.Message.MessageID
+
+			bot.Send(msg)
+				continue
+			}
 			str := strings.Split(update.Message.Text, " ")
 
 			name := strings.Join(str[:len(str)-2], " ")
@@ -58,11 +70,12 @@ func main() {
 				continue
 			}
 
-			s.AddItem(storage.Item{Name: name, Sum: r, Currency: "RUB"})
+			repo.AddItem(storage.Item{Name: name, Sum: r, Currency: "RUB"})
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 			msg.ReplyToMessageID = update.Message.MessageID
 
 			bot.Send(msg)
+			
 		}
 	}
 
